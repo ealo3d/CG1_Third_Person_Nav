@@ -8,8 +8,11 @@ public class PlayerMovement : MonoBehaviour
     Vector3 moveDirection;
     Transform cameraObject;
     Rigidbody playerRigidbody;
-    public float movementSpeed = 7;
+    public float walkingSpeed = 2.5f; //to control the walking speed
+    public float runningSpeed = 7; //right-click rename to change the name in the whole script
     public float rotationSpeed = 15;
+
+    public bool isRunning; //variable to know if the player is running or not
 
     private void Awake()
     {
@@ -24,7 +27,17 @@ public class PlayerMovement : MonoBehaviour
         moveDirection = moveDirection + cameraObject.right * inputManager.horizontalInput;
         moveDirection.y = 0;
         moveDirection.Normalize();
-        moveDirection = moveDirection * movementSpeed;
+
+        if (isRunning) //if is running
+        {
+            moveDirection = moveDirection * runningSpeed;//change to running speed
+        }
+        else
+        {
+            moveDirection = moveDirection * walkingSpeed;//keep the walking speed                                 
+        }
+
+
         Vector3 movementVelocity = moveDirection;
         playerRigidbody.linearVelocity = movementVelocity;
     }
@@ -37,8 +50,8 @@ public class PlayerMovement : MonoBehaviour
         targetDirection.y = 0;
         targetDirection.Normalize();
 
-        if (targetDirection == Vector3.zero) //if the rotation = starting rotation
-            targetDirection = transform.forward; //set rotation point forward
+        if (targetDirection == Vector3.zero)
+            targetDirection = transform.forward;
 
         Quaternion targetRotation = Quaternion.LookRotation(targetDirection);
         Quaternion playerRotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
@@ -52,4 +65,3 @@ public class PlayerMovement : MonoBehaviour
 
     }
 }
-

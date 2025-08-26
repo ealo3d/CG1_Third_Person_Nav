@@ -5,18 +5,20 @@ using UnityEngine;
 public class InputManager : MonoBehaviour
 {
     PlayerControls playerControls;
-
-    AnimatorManager animatorManager;//to reference the script
-
+    AnimatorManager animatorManager;
+    PlayerMovement playerMovement;//reference to PlayerMovement3rd speed
 
     public Vector2 movementInput;
-    private float moveAmount;//to store the movement amount
+    public float moveAmount; //change from private to public
     public float verticalInput;
     public float horizontalInput;
 
-    private void Awake()//create
+    public bool shiftInput; //to receive the input after pressing SHIFT
+
+    private void Awake()
     {
-        animatorManager = GetComponent<AnimatorManager>();//Get the component
+        animatorManager = GetComponent<AnimatorManager>();
+        playerMovement = GetComponent<PlayerMovement>(); //get the script component
     }
 
     private void OnEnable()
@@ -25,6 +27,9 @@ public class InputManager : MonoBehaviour
         {
             playerControls = new PlayerControls();
             playerControls.PlayerMovement.Movement.performed += i => movementInput = i.ReadValue<Vector2>();
+
+            playerControls.PlayerActions.Shift.performed += i => shiftInput = true;//when pressing the SHIFT key set shiftInput true
+            playerControls.PlayerActions.Shift.canceled += i => shiftInput = false;//when releasing the SHIFT key set shiftInput false
         }
         playerControls.Enable();
     }
@@ -38,17 +43,25 @@ public class InputManager : MonoBehaviour
     {
         verticalInput = movementInput.y;
         horizontalInput = movementInput.x;
-
-        //Clampts the ABSolute value of horizontal and vertical input to 0 - 1 range
         moveAmount = Mathf.Clamp01(Mathf.Abs(horizontalInput) + Mathf.Abs(verticalInput));
-
-        //pass just the vertical movement (W,S keys)
-        animatorManager.UpdateAnimatorValues(0, moveAmount);
+        animatorManager.UpdateAnimatorValues(0, moveAmount, playerMovement.isRunning); //add "playerMovement.isRunning"(doesn’t exist yet) 
     }
 
     public void HandleAllInputs()
     {
         HandleMovementInput();
+        HandleRunningInput();//call
+    }
+
+    private void HandleRunningInput()//create
+    {
+        if (shiftInput && moveAmount > 0.5f)//
+        {
+            playerMovement.isRunning = true;//
+        }
+        else
+        {
+            playerMovement.isRunning = false;//
+        }
     }
 }
-
