@@ -4,25 +4,33 @@ using UnityEngine;
 
 public class PlayerManager : MonoBehaviour
 {
-    InputManager inputManager; //to reference the InputManager script
-    PlayerMovement playerMovement; //to reference the PlayerMovement3rd script
+    Animator animator;//to store the animator component
+    InputManager inputManager;
+    PlayerMovement playerMovement;
+
+    public bool isInteracting; //bool to get the status from the animator
 
     private void Awake()
     {
-        inputManager = GetComponent<InputManager>(); //   
-        playerMovement = GetComponent<PlayerMovement>(); //
+        animator = GetComponent<Animator>();//get the component
+        inputManager = GetComponent<InputManager>();
+        playerMovement = GetComponent<PlayerMovement>();
     }
 
     private void Update()
     {
-        inputManager.HandleAllInputs();//call HandleAllInputs() on inputManager3rd 
+        inputManager.HandleAllInputs();
     }
 
-    //Fixed Update update at a fixed steps defined in the editor
-    //Recommended for all physics and collisions that rely on time intervals  
     private void FixedUpdate()
     {
-        //call the function that handle all movements
         playerMovement.HandleAllMovement();
     }
+
+    private void LateUpdate()//code here is executed after the update()
+    {
+        //check every frame in the animator the status of "isInteracting" and update isInteracting bool here
+        isInteracting = animator.GetBool("isInteracting");
+    }
 }
+
