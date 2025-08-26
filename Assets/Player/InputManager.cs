@@ -5,10 +5,19 @@ using UnityEngine;
 public class InputManager : MonoBehaviour
 {
     PlayerControls playerControls;
-    public Vector2 movementInput;
 
-    public float verticalInput; // to store the Y value from the vertor 2 movementInput
-    public float horizontalInput; // to store the X value from the vertor 2 movementInput
+    AnimatorManager animatorManager;//to reference the script
+
+
+    public Vector2 movementInput;
+    private float moveAmount;//to store the movement amount
+    public float verticalInput;
+    public float horizontalInput;
+
+    private void Awake()//create
+    {
+        animatorManager = GetComponent<AnimatorManager>();//Get the component
+    }
 
     private void OnEnable()
     {
@@ -25,18 +34,21 @@ public class InputManager : MonoBehaviour
         playerControls.Disable();
     }
 
-    private void HandleMovementInput() //function to handle inputs from player movements
+    private void HandleMovementInput()
     {
-        verticalInput = movementInput.y; //get just the Y value from the vector 2 movementInput 
-        horizontalInput = movementInput.x; //get just the X value from the vector 2 movementInput
+        verticalInput = movementInput.y;
+        horizontalInput = movementInput.x;
+
+        //Clampts the ABSolute value of horizontal and vertical input to 0 - 1 range
+        moveAmount = Mathf.Clamp01(Mathf.Abs(horizontalInput) + Mathf.Abs(verticalInput));
+
+        //pass just the vertical movement (W,S keys)
+        animatorManager.UpdateAnimatorValues(0, moveAmount);
     }
 
-    public void HandleAllInputs()//function to handle all movements
+    public void HandleAllInputs()
     {
-        HandleMovementInput();//To handle movement
-        //HandleJumpingInput();//To manage Jumping
-        //Handle any other function I want!
-
+        HandleMovementInput();
     }
 }
 
